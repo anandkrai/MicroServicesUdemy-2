@@ -1,0 +1,179 @@
+Challenges with MocroServices:
+================================================================================================================================================
+1: Bounded Context --> Instead of one monolithic application, we develop the 5 microservices for same application, so what should be boundry of 
+                       each microservices means which modules comes under which services. Microservice application is as good as much bounded context is  
+                       defined as fine grained level.
+2: Configuration Management --> Its very imp part. Lets suppose there are 10 microservices and each MS has diff environment eg test env, pre prod
+                       env, prod env and each MS on every env have 3 instances. So there is lot of burden on ops team. So deciding configuration 
+                       mgmt is very critical for MS oriented application.
+3: Dynamic Scale Up and Scale Down --> Using Dynamic Load Balancing machanism we can achieve this.
+4: Visibility -->      Lets suppose there are 10 microservices running and dashboard showing some problems, so in this case how properly we can 
+                       know that which MS has prob or which microservice instance are down. So Visibility is very imp for MS application.
+5: Fault Tolarance-->  
+================================================================================================================================================
+
+Complete code and details on github.com URL:
+https://github.com/in28minutes/spring-microservices/tree/master/03.microservices
+
+Git Command:
+
+C:/anand/myWorkSpace/MicroServicesUdemy-2/spring-cloud-config-server/git-localconfig-repo
+C:\anand\myWorkSpace\MicroServicesUdemy-2\spring-cloud-config-server\git-localconfig-repo
+
+git init         //for initializing the git repo folder which created on local server
+
+git add -A       //for adding the properties file into git repo folder
+
+git add *       //for adding the all properties file into git repo folder
+
+git status      // to know status of commited files 
+
+git commit -m "first commit" // for commiting the added files 
+
+
+==>JDBC URL for h2 DataBase(in-memory DB):
+in URL: http://localhost:8000/h2-console/
+inside text box--> JDBC URL:   jdbc:h2:mem:testdb
+
+
+==> For running the same application duplicate instance on diff port:
+Go to the eclipse Run Configuration -> arguments -> vm arguments and type '-Dserver.port=port number eg 8001'
+
+
+==> for Installing RabbitMQ, first we need to install Erlang. we can download from https://www.erlang.org/downloads and 
+    then install RabbitMQ from https://www.rabbitmq.com/install-windows.html.
+    Go to the location: https://zipkin.io/pages/quickstart , under JAVA topic, click on Latest Release and this will down load the latest zipkin jar.
+   
+    We have to use following command to run Zipkin server from command prompt:
+    set RABBIT_URI=amqp://localhost	
+    java -jar zipkin-server-2.12.9-exec.jar (go to the directory where zipkin-server-2.12.9-exec.jar is placed : C:\anand\AnandDocuments\SOFTWARE)
+
+rabbitmq-service.bat stop  
+rabbitmq-service.bat install  
+rabbitmq-service.bat start
+
+
+      server                                                              port
+=============================================================================================
+GroupId:  com.in28minutes.microservices
+
+Selected dependency for this proj from https://start.spring.io/:
+Web, DevTools, Actuator, Config Client
+--> limits-service                                                        8080
+    http://localhost:8080/limits
+
+
+Selected dependency for this proj from https://start.spring.io/:
+DevTools, Config server
+--> spring-cloud-config-server                                            8888
+    http://localhost:8888/limits-service/qa
+
+
+Selected dependency for this proj from https://start.spring.io/:
+Web, DevTools, Actuator, Config Client
+--> currency-exchange-service                                             8000,8001,8002..
+    http://localhost:8000/currency-exchange/from/USD/to/INR
+--> h2 consol url:
+    http://localhost:8000/h2-console/
+
+
+Selected dependency for this proj from https://start.spring.io/:
+Web, DevTools, Actuator, Config Client
+--> currency-conversion-service                                           8100,8101,8102..
+    http://localhost:8100/currency-converter/from/USD/to/INR/quantity/10
+
+
+--> currency-conversion-service (using Feign)                             8100,8101,8102..  
+    http://localhost:8100/currency-converter-feign/from/AUD/to/INR/quantity/10
+
+Selected dependency for Eureka proj from https://start.spring.io/:
+Eureka server, DevTools, Actuator, Config Client
+--> netflix-eureka-naming-server                                          8761
+    http://localhost:8761/
+    http://localhost:8761/eureka/
+
+Selected dependency for Zuul proj from https://start.spring.io/:
+Zuul, Eureka discovery, DevTools, Actuator
+--> netflix-zuul-api-gateway-server                                       8765
+    http://localhost:8765/{application name}/{uri}
+    For Example: http://localhost:8765/currency-exchange-service/currency-exchange/from/USD/to/INR
+                 http://localhost:8765/currency-conversion-service/currency-converter-feign/from/USD/to/INR/quantity/10  
+
+Zipkin server:
+--> http://localhost:9411/zipkin                                          9411
+
+==============================================================================================
+Config Clinet: Client that connects to Spring Cloud Config server to fetch the application's configuration
+
+Config Server: Central management for configuration via Git, SVN or HashoCorp Vault.
+
+
+===============================================================================================
+What Is a Feign Client?
+Netflix provides Feign as an abstraction over REST-based calls, by which microservices can communicate with each other, but developers don't have to 
+bother  about REST internal details.
+
+Ribbon: Client side load Balancing framework.
+
+Eureka Naming Server: Service Discovery and service registration
+
+API GATEWAYS: ZUUL
+-> Authentication, Authorization and Security
+-> Rate Limits
+-> Fault Tolerance
+-> Service Aggregation
+-> Why do we need an API Gateway like Zuul?
+When we talk about a microservices architecture, we deal with multiple microservices talking to each other:
+How do we make sure we intercept requests and messages exchanged between each pair of microservices? That's where the API Gateway comes into the picture.
+Whenever an external service request arrives in the enterprise, or there is an internal communication between microservices, we have it go through the API gateway.
+API Gateway is a centralized location where you can implement features like authentication, logging, auditing, and rate limiting. For example, you may not want Microservice3 to be called more than 10 times by a particular client. You could do that as part of rate limiting in the API gateway.
+The API gateway acts as a centralized store for the common features for microservices, in your enterprise application.
+A popular API Gateway implementation is Zuul API Gateway.
+Typically there is a warmup time that is needed at the start of the services to ensure they are all connected - about a couple of minutes usually.
+
+Spring Cloud Sleuth:
+Spring Cloud Sleuth implements a distributed tracing solution for Spring Cloud, borrowing heavily from Dapper, Zipkin and HTrace. For most users 
+Sleuth should be invisible, and all your interactions with external systems should be instrumented automatically. You can capture data simply in logs, 
+or by sending it to a remote collector service.
+If spring-cloud-sleuth-zipkin is available then the app will generate and collect Zipkin-compatible traces via HTTP. By default it sends them to a 
+Zipkin collector service on localhost (port 9411). Configure the location of the service using spring.zipkin.baseUrl.
+
+
+Distributed Tracing: Zipkin 
+Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both 
+the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.
+Applications are instrumented to report timing data to Zipkin. The Zipkin UI also presents a Dependency diagram showing how many traced requests went 
+through each application. If you are troubleshooting latency problems or errors, you can filter or sort all traces based on the application, 
+length of trace, annotation, or timestamp. Once you select a trace, you can see the percentage of the total trace time each span takes which allows you to 
+identify the problem application.
+
+RabbitMQ :
+          All the microservices which registerd with this queue will place the generated logs here, then Zipkin will fetch the log from RabbitMQ.  
+
+Spring Cloud Bus: with Use of RabbitMQ
+
+Hystrix : Hystrix framework help us to build fault tolerence microservices.
+
+in boot starter class use annotation @EnableHystrix
+in controller class use annotation @HystrixCommand(fallbackMethod="methodName() "which need to be used when any service is down")
+
+
+--> Debugging problems with Spring Cloud Config Server:
+https://github.com/in28minutes/in28minutes-initiatives/tree/master/The-in28Minutes-TroubleshootingGuide-And-FAQ#debugging-problems-with-spring-cloud-config-server
+
+
+--> Debugging problems with Feign and Ribbon
+https://github.com/in28minutes/in28minutes-initiatives/tree/master/The-in28Minutes-TroubleshootingGuide-And-FAQ#debugging-problems-with-feign-and-ribbon
+
+
+--> Debugging Problems with Naming Server ( Eureka ) and Ribbon
+https://github.com/in28minutes/in28minutes-initiatives/tree/master/The-in28Minutes-TroubleshootingGuide-And-FAQ#debugging-problems-with-naming-server-eureka-and-ribbon
+
+
+
+-->  Debugging Problems with Zuul API Gateway
+https://github.com/in28minutes/in28minutes-initiatives/tree/master/The-in28Minutes-TroubleshootingGuide-And-FAQ#debugging-problems-with-zuul-api-gateway
+
+
+annotation class implementation
+project which include angular Js and microservices
