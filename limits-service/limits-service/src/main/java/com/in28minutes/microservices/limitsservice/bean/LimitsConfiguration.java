@@ -4,7 +4,7 @@ public class LimitsConfiguration {
 	private int maximum;
 	private int minimum;
 	
-	public LimitsConfiguration() {}
+	public LimitsConfiguration() {}//
 	
 	public LimitsConfiguration(int maximum, int minimum) {
 		super();
